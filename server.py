@@ -50,6 +50,5 @@ with socketserver.TCPServer(("", PORT), LuaRequestHandler) as httpd:
     print(f"Python server serving at port {PORT}")
     print("To test, open your browser or use curl:")
     print(f"  curl http://localhost:{PORT}/")
-    print(f"  curl http://localhost:{PORT}/users")
-    print(f"  curl -X POST http://localhost:{PORT}/users")
+    
     httpd.serve_forever()
