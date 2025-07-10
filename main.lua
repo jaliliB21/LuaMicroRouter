@@ -1,7 +1,7 @@
 -- main.lua
 local router = require("router") -- Load our router module
 
--- Define handler functions (as before)
+-- Define handler functions for different routes
 local function home_handler()
     return "Hello from the Home Page!"
 end
@@ -22,12 +22,34 @@ local function error_causing_handler()
     error("Something went wrong in this handler!") -- This handler will cause an error
 end
 
--- Register routes (as before)
+-- NEW: Handler for user details by ID
+-- This handler now expects a 'params' table as its first argument
+local function user_detail_handler(params)
+    -- params.id will contain the value extracted from the URL
+    local user_id = params.id
+    return "Displaying details for User ID: " .. tostring(user_id)
+end
+
+-- NEW: Handler for product details by ID and category
+-- This handler also expects a 'params' table
+local function product_detail_handler(params)
+    local product_id = params.id
+    local category_name = params.category
+    return "Displaying details for Product ID: " .. tostring(product_id) .. " in Category: " .. tostring(category_name)
+end
+
+
+-- Register routes with the router
 router.get("/", home_handler)
 router.get("/users", users_list_handler)
 router.get("/products", products_handler)
 router.post("/users", create_user_handler)
 router.get("/error-test", error_causing_handler)
+
+-- NEW: Register routes with parameters
+router.get("/users/:id", user_detail_handler) -- Example: /users/123
+router.get("/products/:category/:id", product_detail_handler) -- Example: /products/electronics/456
+
 
 --- Get HTTP method and path from command-line arguments ---
 -- 'arg' is a global table in Lua for command-line arguments
@@ -42,6 +64,8 @@ if not method or not path then
     -- If no arguments are provided, print a message (useful when running main.lua directly for debugging)
     io.stderr:write("Usage: lua main.lua <METHOD> <PATH>\n")
     io.stderr:write("Example: lua main.lua GET /users\n")
+    io.stderr:write("Example for parameters: lua main.lua GET /users/123\n")
+    io.stderr:write("Example for multiple parameters: lua main.lua GET /products/books/xyz\n")
     os.exit(1) -- Exit with an error code
 end
 
