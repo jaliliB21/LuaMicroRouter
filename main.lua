@@ -51,24 +51,3 @@ router.get("/users/:id", user_detail_handler) -- Example: /users/123
 router.get("/products/:category/:id", product_detail_handler) -- Example: /products/electronics/456
 
 
---- Get HTTP method and path from command-line arguments ---
--- 'arg' is a global table in Lua for command-line arguments
--- arg[0] is the script name itself (main.lua)
--- arg[1] is the first argument (method)
--- arg[2] is the second argument (path)
-
-local method = arg[1]
-local path = arg[2]
-
-if not method or not path then
-    -- If no arguments are provided, print a message (useful when running main.lua directly for debugging)
-    io.stderr:write("Usage: lua main.lua <METHOD> <PATH>\n")
-    io.stderr:write("Example: lua main.lua GET /users\n")
-    io.stderr:write("Example for parameters: lua main.lua GET /users/123\n")
-    io.stderr:write("Example for multiple parameters: lua main.lua GET /products/books/xyz\n")
-    os.exit(1) -- Exit with an error code
-end
-
--- Dispatch the request and print the response to standard output
-local response = router.dispatch(method, path)
-print(response) -- This output will be captured by the Python server
