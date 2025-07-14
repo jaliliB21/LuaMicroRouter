@@ -1,53 +1,28 @@
--- main.lua
-local router = require("router") -- Load our router module
+local router = require("router") -- Load our router modules
 
--- Define handler functions for different routes
-local function home_handler()
-    return "Hello from the Home Page!"
-end
+-- Load handlers and middlewares from their respective files
+local views = require("views")
+local middlewares = require("middlewares")
 
-local function users_list_handler()
-    return "Listing all users."
-end
-
-local function products_handler()
-    return "Products API endpoint."
-end
-
-local function create_user_handler()
-    return "User created successfully (POST request)."
-end
-
-local function error_causing_handler()
-    error("Something went wrong in this handler!") -- This handler will cause an error
-end
-
--- NEW: Handler for user details by ID
--- This handler now expects a 'params' table as its first argument
-local function user_detail_handler(params)
-    -- params.id will contain the value extracted from the URL
-    local user_id = params.id
-    return "Displaying details for User ID: " .. tostring(user_id)
-end
-
--- NEW: Handler for product details by ID and category
--- This handler also expects a 'params' table
-local function product_detail_handler(params)
-    local product_id = params.id
-    local category_name = params.category
-    return "Displaying details for Product ID: " .. tostring(product_id) .. " in Category: " .. tostring(category_name)
-end
+-- --- Register Middleware ---
+-- Order matters! Global error handler should be registered first.
+router.use(middlewares.global_error_handler_middleware)
+router.use(middlewares.logger_middleware)
+router.use(middlewares.auth_middleware)
 
 
--- Register routes with the router
-router.get("/", home_handler)
-router.get("/users", users_list_handler)
-router.get("/products", products_handler)
-router.post("/users", create_user_handler)
-router.get("/error-test", error_causing_handler)
+-- --- Register Routes ---
+router.get("/", views.home_handler)
+router.get("/users", views.users_list_handler)
+router.get("/products", views.products_handler)
+router.post("/users", views.create_user_handler)
+router.get("/error-test", views.error_causing_handler)
 
--- NEW: Register routes with parameters
-router.get("/users/:id", user_detail_handler) -- Example: /users/123
-router.get("/products/:category/:id", product_detail_handler) -- Example: /products/electronics/456
+-- Routes with parameters
+router.get("/users/:id", views.user_detail_handler)
+router.get("/products/:category/:id", views.product_detail_handler)
 
+-- Admin routes for authentication test
+router.get("/admin/dashboard", views.admin_dashboard_handler)
+router.get("/admin/authorized", views.admin_authorized_handler)
 
